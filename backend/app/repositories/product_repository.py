@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
-from app.models.product import Product
-from app.schemas.products import ProductCreate
-
+from ..models.product import Product
+from ..schemas.product import ProductCreate
 
 class ProductRepository:
     def __init__(self, db: Session):
@@ -12,13 +11,20 @@ class ProductRepository:
         return self.db.query(Product).options(joinedload(Product.category)).all()
 
     def get_by_id(self, product_id: int) -> Optional[Product]:
-        return self.db.query(Product).filter((Product.id == product_id)).first()
+        return (
+            self.db.query(Product)
+            .options(joinedload(Product.category))
+            .filter(Product.id == product_id)
+            .first()
+        )
 
-    def get_by_slug(self, product_slug: str) -> Optional[Product]:
-        return self.db.query(Product).filter(Product.slug == product_slug).first()
-
-    def get_by_category_id(self, category_id: int) -> List[Product]:
-        return self.db.query(Product).filter(Product.category_id == category_id).all()
+    def get_by_category(self, category_id: int) -> List[Product]:
+        return (
+            self.db.query(Product)
+            .options(joinedload(Product.category))
+            .filter(Product.category_id == category_id)
+            .all()
+        )
 
     def create(self, product_data: ProductCreate) -> Product:
         db_product = Product(**product_data.model_dump())

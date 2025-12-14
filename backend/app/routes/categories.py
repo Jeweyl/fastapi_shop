@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from typing import List
-from app.database import get_db
-from app.services.category_services import CategoryService
-from app.schemas.category import CategoryResponse
+from ..database import get_db
+from ..services.category_service import CategoryService
+from ..schemas.category import CategoryResponse
 
 router = APIRouter(
     prefix="/api/categories",
     tags=['categories']
-
 )
+
 @router.get("", response_model=List[CategoryResponse], status_code=status.HTTP_200_OK)
-def get_all_categories(db: Session = Depends(get_db)):
+def get_categories(db: Session = Depends(get_db)):
     service = CategoryService(get_db)
     return service.get_all_categories()
 
